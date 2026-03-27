@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>StreakFit</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #0A0A0A;
+      color: #fff;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+    .card {
+      text-align: center;
+      max-width: 360px;
+      width: 100%;
+    }
+    .logo {
+      font-size: 48px;
+      margin-bottom: 16px;
+    }
+    .title {
+      font-size: 22px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+    .subtitle {
+      font-size: 15px;
+      color: #A1A1A1;
+      margin-bottom: 32px;
+      line-height: 1.5;
+    }
+    .btn {
+      display: inline-block;
+      background: #F97316;
+      color: #fff;
+      font-size: 16px;
+      font-weight: 700;
+      padding: 14px 32px;
+      border-radius: 12px;
+      text-decoration: none;
+      cursor: pointer;
+      border: none;
+    }
+    .error-icon { font-size: 48px; margin-bottom: 16px; }
+    .error-title { font-size: 22px; font-weight: 700; margin-bottom: 8px; color: #EF4444; }
+    .error-sub { font-size: 15px; color: #A1A1A1; }
+  </style>
+</head>
+<body>
+  <div class="card" id="loading">
+    <div class="logo">🔥</div>
+    <div class="title">Opening StreakFit...</div>
+    <div class="subtitle">You'll be redirected to the app in a moment.</div>
+  </div>
+
+  <div class="card" id="no-app" style="display:none">
+    <div class="logo">🔥</div>
+    <div class="title">Get StreakFit</div>
+    <div class="subtitle">Download the app to view this post and start tracking your fitness streak.</div>
+  </div>
+
+  <div class="card" id="invalid" style="display:none">
+    <div class="error-icon">⚠️</div>
+    <div class="error-title">Invalid link</div>
+    <div class="error-sub">This link is not valid or has expired.</div>
+  </div>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const raw = params.get('id');
+    const id = parseInt(raw, 10);
+
+    if (!raw || isNaN(id) || id <= 0 || String(id) !== raw.trim()) {
+      document.getElementById('loading').style.display = 'none';
+      document.getElementById('invalid').style.display = 'block';
+    } else {
+      const deepLink = 'streakfit://post/' + id;
+      window.location.href = deepLink;
+
+      // If still here after 2s, app is probably not installed
+      setTimeout(() => {
+        document.getElementById('loading').style.display = 'none';
+        document.getElementById('no-app').style.display = 'block';
+      }, 2000);
+    }
+  </script>
+</body>
+</html>
