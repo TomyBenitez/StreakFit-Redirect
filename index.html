@@ -21,75 +21,76 @@
       max-width: 360px;
       width: 100%;
     }
-    .logo {
-      font-size: 48px;
-      margin-bottom: 16px;
-    }
-    .title {
-      font-size: 22px;
-      font-weight: 700;
-      margin-bottom: 8px;
-    }
-    .subtitle {
-      font-size: 15px;
-      color: #A1A1A1;
-      margin-bottom: 32px;
-      line-height: 1.5;
-    }
+    .logo { font-size: 52px; margin-bottom: 16px; }
+    .title { font-size: 22px; font-weight: 700; margin-bottom: 8px; }
+    .subtitle { font-size: 15px; color: #A1A1A1; margin-bottom: 32px; line-height: 1.5; }
     .btn {
       display: inline-block;
       background: #F97316;
       color: #fff;
       font-size: 16px;
       font-weight: 700;
-      padding: 14px 32px;
+      padding: 14px 36px;
       border-radius: 12px;
       text-decoration: none;
       cursor: pointer;
       border: none;
+      width: 100%;
     }
+    .hint { font-size: 13px; color: #555; margin-top: 20px; }
     .error-icon { font-size: 48px; margin-bottom: 16px; }
     .error-title { font-size: 22px; font-weight: 700; margin-bottom: 8px; color: #EF4444; }
     .error-sub { font-size: 15px; color: #A1A1A1; }
   </style>
 </head>
 <body>
-  <div class="card" id="loading">
+
+  <div class="card" id="view-open">
     <div class="logo">🔥</div>
-    <div class="title">Opening StreakFit...</div>
-    <div class="subtitle">You'll be redirected to the app in a moment.</div>
+    <div class="title">View on StreakFit</div>
+    <div class="subtitle">Someone shared a post with you.</div>
+    <button class="btn" onclick="openApp()">Open in StreakFit</button>
+    <p class="hint">Don't have the app? Download StreakFit to view this post.</p>
   </div>
 
-  <div class="card" id="no-app" style="display:none">
-    <div class="logo">🔥</div>
-    <div class="title">Get StreakFit</div>
-    <div class="subtitle">Download the app to view this post and start tracking your fitness streak.</div>
-  </div>
-
-  <div class="card" id="invalid" style="display:none">
+  <div class="card" id="view-invalid" style="display:none">
     <div class="error-icon">⚠️</div>
     <div class="error-title">Invalid link</div>
     <div class="error-sub">This link is not valid or has expired.</div>
   </div>
 
   <script>
-    const params = new URLSearchParams(window.location.search);
-    const raw = params.get('id');
-    const id = parseInt(raw, 10);
+    var postId = null;
 
-    if (!raw || isNaN(id) || id <= 0 || String(id) !== raw.trim()) {
-      document.getElementById('loading').style.display = 'none';
-      document.getElementById('invalid').style.display = 'block';
-    } else {
-      const deepLink = 'streakfit://post/' + id;
-      window.location.href = deepLink;
+    (function () {
+      var params = new URLSearchParams(window.location.search);
+      var raw = params.get('id');
+      var parsed = parseInt(raw, 10);
 
-      // If still here after 2s, app is probably not installed
-      setTimeout(() => {
-        document.getElementById('loading').style.display = 'none';
-        document.getElementById('no-app').style.display = 'block';
-      }, 2000);
+      if (!raw || isNaN(parsed) || parsed <= 0 || String(parsed) !== raw.trim()) {
+        document.getElementById('view-open').style.display = 'none';
+        document.getElementById('view-invalid').style.display = 'block';
+      } else {
+        postId = parsed;
+      }
+    })();
+
+    function openApp() {
+      if (!postId) return;
+
+      var isAndroid = /android/i.test(navigator.userAgent);
+
+      if (isAndroid) {
+        // intent:// lets Chrome open the app or go to Play Store if not installed
+        window.location.href =
+          'intent://post/' + postId +
+          '#Intent;scheme=streakfit;package=com.anonymous.StreakFit;end';
+      } else {
+        // iOS Safari allows custom scheme on user gesture
+        window.location.href = 'streakfit://post/' + postId;
+      }
     }
   </script>
+
 </body>
 </html>
