@@ -16,16 +16,12 @@
       justify-content: center;
       padding: 24px;
     }
-    .card {
-      text-align: center;
-      max-width: 360px;
-      width: 100%;
-    }
+    .card { text-align: center; max-width: 360px; width: 100%; }
     .logo { font-size: 52px; margin-bottom: 16px; }
     .title { font-size: 22px; font-weight: 700; margin-bottom: 8px; }
     .subtitle { font-size: 15px; color: #A1A1A1; margin-bottom: 32px; line-height: 1.5; }
     .btn {
-      display: inline-block;
+      display: block;
       background: #F97316;
       color: #fff;
       font-size: 16px;
@@ -33,9 +29,8 @@
       padding: 14px 36px;
       border-radius: 12px;
       text-decoration: none;
-      cursor: pointer;
-      border: none;
       width: 100%;
+      text-align: center;
     }
     .hint { font-size: 13px; color: #555; margin-top: 20px; }
     .error-icon { font-size: 48px; margin-bottom: 16px; }
@@ -49,7 +44,7 @@
     <div class="logo">🔥</div>
     <div class="title">View on StreakFit</div>
     <div class="subtitle">Someone shared a post with you.</div>
-    <button class="btn" onclick="openApp()">Open in StreakFit</button>
+    <a id="open-btn" class="btn" href="#">Open in StreakFit</a>
     <p class="hint">Don't have the app? Download StreakFit to view this post.</p>
   </div>
 
@@ -60,36 +55,32 @@
   </div>
 
   <script>
-    var postId = null;
-
     (function () {
-      var params = new URLSearchParams(window.location.search);
-      var raw = params.get('id');
-      var parsed = parseInt(raw, 10);
+      var params  = new URLSearchParams(window.location.search);
+      var raw     = params.get('id');
+      var parsed  = parseInt(raw, 10);
 
       if (!raw || isNaN(parsed) || parsed <= 0 || String(parsed) !== raw.trim()) {
-        document.getElementById('view-open').style.display = 'none';
+        document.getElementById('view-open').style.display   = 'none';
         document.getElementById('view-invalid').style.display = 'block';
-      } else {
-        postId = parsed;
+        return;
       }
-    })();
 
-    function openApp() {
-      if (!postId) return;
-
+      var btn      = document.getElementById('open-btn');
       var isAndroid = /android/i.test(navigator.userAgent);
 
       if (isAndroid) {
-        // intent:// lets Chrome open the app or go to Play Store if not installed
-        window.location.href =
-          'intent://post/' + postId +
-          '#Intent;scheme=streakfit;end';
+        // intent:// is the only reliable way on Chrome Android.
+        // S.browser_fallback_url=about:blank prevents Play Store redirect when app is not installed.
+        btn.href =
+          'intent://post/' + parsed +
+          '#Intent;scheme=streakfit;package=com.anonymous.StreakFit' +
+          ';S.browser_fallback_url=about%3Ablank;end';
       } else {
-        // iOS Safari allows custom scheme on user gesture
-        window.location.href = 'streakfit://post/' + postId;
+        // iOS Safari allows custom scheme on user tap via anchor tag
+        btn.href = 'streakfit://post/' + parsed;
       }
-    }
+    })();
   </script>
 
 </body>
