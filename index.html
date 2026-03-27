@@ -84,7 +84,7 @@
         // intent:// lets Chrome open the app or go to Play Store if not installed
         window.location.href =
           'intent://post/' + postId +
-          '#Intent;scheme=streakfit;package=com.anonymous.StreakFit;end';
+          '#Intent;scheme=streakfit;end';
       } else {
         // iOS Safari allows custom scheme on user gesture
         window.location.href = 'streakfit://post/' + postId;
