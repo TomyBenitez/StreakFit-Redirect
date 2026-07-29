@@ -71,11 +71,14 @@
 
       if (isAndroid) {
         // intent:// is the only reliable way on Chrome Android.
-        // S.browser_fallback_url=about:blank prevents Play Store redirect when app is not installed.
+        // Chrome ignores non-http(s) fallback URLs (e.g. about:blank) and falls back to
+        // its own Play Store lookup for the given package instead. Using the current
+        // https page as the fallback keeps the user on this page when the app isn't installed.
+        var fallback = encodeURIComponent(window.location.href);
         btn.href =
           'intent://post/' + parsed +
           '#Intent;scheme=streakfit;package=com.anonymous.StreakFit' +
-          ';S.browser_fallback_url=about%3Ablank;end';
+          ';S.browser_fallback_url=' + fallback + ';end';
       } else {
         // iOS Safari allows custom scheme on user tap via anchor tag
         btn.href = 'streakfit://post/' + parsed;
