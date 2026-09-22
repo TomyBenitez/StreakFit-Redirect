@@ -43,9 +43,9 @@
   <div class="card" id="view-open">
     <div class="logo">🔥</div>
     <div class="title">View on StreakFit</div>
-    <div class="subtitle">Someone shared a post with you.</div>
+    <div class="subtitle" id="subtitle">Someone shared a post with you.</div>
     <a id="open-btn" class="btn" href="#">Open in StreakFit</a>
-    <p class="hint">Don't have the app? Download StreakFit to view this post.</p>
+    <p class="hint" id="hint">Don't have the app? Download StreakFit to view this post.</p>
   </div>
 
   <div class="card" id="view-invalid" style="display:none">
@@ -56,14 +56,24 @@
 
   <script>
     (function () {
-      var params  = new URLSearchParams(window.location.search);
-      var raw     = params.get('id');
-      var parsed  = parseInt(raw, 10);
+      var params = new URLSearchParams(window.location.search);
+
+      // ?id=<postId> or ?profile=<userId>
+      var kind = params.has('profile') ? 'profile' : 'id';
+      var raw = params.get(kind);
+      var parsed = parseInt(raw, 10);
 
       if (!raw || isNaN(parsed) || parsed <= 0 || String(parsed) !== raw.trim()) {
         document.getElementById('view-open').style.display   = 'none';
         document.getElementById('view-invalid').style.display = 'block';
         return;
+      }
+
+      var routePath = kind === 'profile' ? 'profile/' + parsed : 'post/' + parsed;
+
+      if (kind === 'profile') {
+        document.getElementById('subtitle').textContent = 'Someone shared a profile with you.';
+        document.getElementById('hint').textContent = "Don't have the app? Download StreakFit to view this profile.";
       }
 
       var btn      = document.getElementById('open-btn');
@@ -76,12 +86,12 @@
         // https page as the fallback keeps the user on this page when the app isn't installed.
         var fallback = encodeURIComponent(window.location.href);
         btn.href =
-          'intent://post/' + parsed +
+          'intent://' + routePath +
           '#Intent;scheme=streakfit;package=com.anonymous.StreakFit' +
           ';S.browser_fallback_url=' + fallback + ';end';
       } else {
         // iOS Safari allows custom scheme on user tap via anchor tag
-        btn.href = 'streakfit://post/' + parsed;
+        btn.href = 'streakfit://' + routePath;
       }
     })();
   </script>
